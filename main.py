@@ -2,10 +2,11 @@ import os
 from utils import *
 
 if __name__ == "__main__":
-    print("hello world")
-
-    #load_csv_file("data/lapaz_bd_2.csv", ",")
-    json_records = load_json_file("data/drugcatalog201901.json")
-    csv_data =json_to_csv(json_records)
-    save_csv_file(csv_data)
+    saving_file_name = file_name = ""
+    csv_data = load_csv_file(file_name, ",")
+    #json_data = csv_to_json(csv_data)
+    #save_json_file(json_data, saving_file_name)
+    #json_records = load_json_file(file_name)
+    #csv_data =json_to_csv(json_records)
+    #save_csv_file(csv_data)
 
