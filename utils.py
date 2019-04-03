@@ -1,5 +1,9 @@
 import csv
 import json
+import tinys3
+import config
+import urllib3
+from bs4 import BeautifulSoup
 
 
 def load_json_file(filepath):
@@ -94,7 +98,50 @@ def csv_to_json(csv_data):
     return json_records
 
 
-    
+def download_image_s3(url, img_name):
+    """Download the image from S3 bucket"""
+    http = urllib3.PoolManager()
+
+    response_image = http.request('GET', url, preload_content=False)
+    print("status", response_image.status)
+
+    with open(img_name, 'wb') as out:
+        while True:
+            data = response_image.read(1024)
+            if not data:
+                break
+            out.write(data)
+
+    conn = tinys3.Connection(config.ACCESS_KEY, config.SECRET_KEY, tls=True)
+    with open(img_name, 'rb') as myimg:
+        conn.upload(config.FOLDER+img_name, myimg, 'drugs-catalog')
+
+
+def get_page_meds(page_url):
+    """Get the medications information from the current page"""
+    meds_array = []
+    http = urllib3.PoolManager()
+    response = http.request('GET', page_url)
+    soup = BeautifulSoup(response.data, 'html.parser')
+
+    descriptions = soup.findAll('p', attrs={'class': 'item-subtitle'})
+    # Take out the <div> of name and get its value
+    i = 0
+    for medicine_name in soup.findAll('p', attrs={'class': 'item-title'}):
+
+        med_name = medicine_name.text.strip() # strip() is used to remove starting and trailing
+        img_url = soup.find('img', attrs={'class': 'item-image img-responsive', 'title':med_name})
+        description = descriptions[i]
+
+        #response_image = http.request('GET', img_url['src'], preload_content=False)
+
+        meds_array.append({"name":med_name, "description":description.text.strip(), "img_url":  img_url['src']})
+        #print (med_name, img_url['src'], description.text.strip())
+        i += 1
+    response.release_conn()
+
+    return meds_array
+
     
     
     

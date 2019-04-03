@@ -10,3 +10,6 @@ if __name__ == "__main__":
     #csv_data =json_to_csv(json_records)
     #save_csv_file(csv_data)
 
+    #for i in range(0,164):
+    #    page_url = "<URL>"+ str(i)
+    #    all_the_products = all_the_products + get_page_meds(page_url)

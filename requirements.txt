@@ -1,0 +1,2 @@
+tinys3==0.1.12
+beautifulsoup4==4.7.1
