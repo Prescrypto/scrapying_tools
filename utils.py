@@ -1,9 +1,15 @@
 import csv
 import json
 import tinys3
-import config
+import config as conf
 import urllib3
 from bs4 import BeautifulSoup
+import logging
+from mongoManager import ManageDB
+
+# Load Logging definition
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('tornado-info')
 
 
 def load_json_file(filepath):
@@ -112,9 +118,9 @@ def download_image_s3(url, img_name):
                 break
             out.write(data)
 
-    conn = tinys3.Connection(config.ACCESS_KEY, config.SECRET_KEY, tls=True)
+    conn = tinys3.Connection(conf.ACCESS_KEY, conf.SECRET_KEY, tls=True)
     with open(img_name, 'rb') as myimg:
-        conn.upload(config.FOLDER+img_name, myimg, 'drugs-catalog')
+        conn.upload(conf.FOLDER+img_name, myimg, 'drugs-catalog')
 
 
 def get_page_meds(page_url):
@@ -142,7 +148,45 @@ def get_page_meds(page_url):
 
     return meds_array
 
-    
-    
+
+def load_mongo_collection(collection_name=conf.DB_MAIN_COLLECTION):
+    """ Return all the records on the collection specified"""
+    result = []
+    my_db = ManageDB(collection_name)
+    try:
+        all_records = {}  # All the records without filter
+        result = list(my_db.select_json(all_records))  # Convert the cursor to a list
+
+    except Exception as e:
+        logger.info("[ERROR] loading the mongo collection: {}".format(e))
+    finally:
+        if my_db is not None:
+            my_db.close()
+
+    return result
+
+
+def modify_collection_fields(data_json_list, keys_list, collection_name=conf.DB_MAIN_COLLECTION):
+    """Update the entire collection with a json array taking as id the specified id_key"""
+    result = []
+    my_db = ManageDB(collection_name)
+    try:
+
+        for data_json in data_json_list:
+            json_keys = dict()
+            for key in keys_list:
+                # Get all the keys and assign the value valid for the current data json (document)
+                json_keys.update({key: data_json.get(key)})
+            result = my_db.update(json_keys, data_json)
+
+        result = data_json_list
+    except Exception as e:
+        logger.info("[ERROR] updating the mongo fields: {}".format(e))
+    finally:
+        if my_db is not None:
+            my_db.close()
+
+    return result
+
     
 

@@ -2,14 +2,12 @@ import os
 from utils import *
 
 if __name__ == "__main__":
-    saving_file_name = file_name = ""
-    csv_data = load_csv_file(file_name, ",")
+    saving_file_name = "new_dump"
+    file_name = "statics/sd-dump.json"
+    #csv_data = load_csv_file(file_name, ",")
     #json_data = csv_to_json(csv_data)
     #save_json_file(json_data, saving_file_name)
     #json_records = load_json_file(file_name)
-    #csv_data =json_to_csv(json_records)
-    #save_csv_file(csv_data)
+    #csv_data = json_to_csv(json_records)
+    #save_csv_file(csv_data, saving_file_name)
 
-    #for i in range(0,164):
-    #    page_url = "<URL>"+ str(i)
-    #    all_the_products = all_the_products + get_page_meds(page_url)
