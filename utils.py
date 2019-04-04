@@ -123,32 +123,6 @@ def download_image_s3(url, img_name):
         conn.upload(conf.FOLDER+img_name, myimg, 'drugs-catalog')
 
 
-def get_page_meds(page_url):
-    """Get the medications information from the current page"""
-    meds_array = []
-    http = urllib3.PoolManager()
-    response = http.request('GET', page_url)
-    soup = BeautifulSoup(response.data, 'html.parser')
-
-    descriptions = soup.findAll('p', attrs={'class': 'item-subtitle'})
-    # Take out the <div> of name and get its value
-    i = 0
-    for medicine_name in soup.findAll('p', attrs={'class': 'item-title'}):
-
-        med_name = medicine_name.text.strip() # strip() is used to remove starting and trailing
-        img_url = soup.find('img', attrs={'class': 'item-image img-responsive', 'title':med_name})
-        description = descriptions[i]
-
-        #response_image = http.request('GET', img_url['src'], preload_content=False)
-
-        meds_array.append({"name":med_name, "description":description.text.strip(), "img_url":  img_url['src']})
-        #print (med_name, img_url['src'], description.text.strip())
-        i += 1
-    response.release_conn()
-
-    return meds_array
-
-
 def load_mongo_collection(collection_name=conf.DB_MAIN_COLLECTION):
     """ Return all the records on the collection specified"""
     result = []
@@ -188,5 +162,19 @@ def modify_collection_fields(data_json_list, keys_list, collection_name=conf.DB_
 
     return result
 
-    
+
+def get_html_specific_tag(page_url, object_dom, object_class):
+    """ Search for all the objects in the current url with this specific HTML dom and class"""
+    http = urllib3.PoolManager()
+    response = http.request('GET', page_url)
+    soup = BeautifulSoup(response.data, 'html.parser')
+
+    object_array = soup.findAll(object_dom, attrs={'class': object_class})
+    response.release_conn()
+    return object_array
+
+
+def get_text_from_object(object_array):
+    """ Receives a soup4 object array and returns a string array with the text of each object"""
+    return [current_tag.text.strip() for current_tag in object_array]
 
