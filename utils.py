@@ -6,6 +6,7 @@ import urllib3
 from bs4 import BeautifulSoup
 import logging
 from mongoManager import ManageDB
+from itertools import chain
 
 # Load Logging definition
 logging.basicConfig(level=logging.INFO)
@@ -104,23 +105,29 @@ def csv_to_json(csv_data):
     return json_records
 
 
-def download_image_s3(url, img_name):
+def download_upload_image_s3(url, img_name):
     """Download the image from S3 bucket"""
-    http = urllib3.PoolManager()
+    try:
+        http = urllib3.PoolManager()
 
-    response_image = http.request('GET', url, preload_content=False)
-    print("status", response_image.status)
+        response_image = http.request('GET', url, preload_content=False)
+        print("status", response_image.status, url)
 
-    with open(img_name, 'wb') as out:
-        while True:
-            data = response_image.read(1024)
-            if not data:
-                break
-            out.write(data)
+        with open('images/'+img_name, 'wb') as out:
+            while True:
+                data = response_image.read(1024)
+                if not data:
+                    break
+                out.write(data)
 
-    conn = tinys3.Connection(conf.ACCESS_KEY, conf.SECRET_KEY, tls=True)
-    with open(img_name, 'rb') as myimg:
-        conn.upload(conf.FOLDER+img_name, myimg, 'drugs-catalog')
+        conn = tinys3.Connection(conf.AWS_ACCESS_KEY, conf.AWS_SECRET_KEY, tls=True)
+        with open("images/"+img_name, 'rb') as myimg:
+            conn.upload(conf.FOLDER+img_name, myimg, 'drugs-catalog')
+
+        return True
+    except Exception as e:
+        logger.error("[ERROR] downloading or uploading images {}".format(e))
+        return False
 
 
 def load_mongo_collection(collection_name=conf.DB_MAIN_COLLECTION):
@@ -163,6 +170,21 @@ def modify_collection_fields(data_json_list, keys_list, collection_name=conf.DB_
     return result
 
 
+def get_html_page(page_url):
+    """ Get the whole page source code"""
+    http = urllib3.PoolManager()
+    response = http.request('GET', page_url)
+    soup = BeautifulSoup(response.data, 'html.parser')
+    response.release_conn()
+    return soup
+
+
+def get_soup_specific_tag(soup, object_dom, object_class):
+    """ Search for all the objects in the current soup object with this specific HTML dom and class"""
+    object_array = soup.findAll(object_dom, attrs={'class': object_class})
+    return object_array
+
+
 def get_html_specific_tag(page_url, object_dom, object_class):
     """ Search for all the objects in the current url with this specific HTML dom and class"""
     http = urllib3.PoolManager()
@@ -178,3 +200,23 @@ def get_text_from_object(object_array):
     """ Receives a soup4 object array and returns a string array with the text of each object"""
     return [current_tag.text.strip() for current_tag in object_array]
 
+
+def get_tag_from_object(object_array, tag):
+    """ Receives a soup4 object array and returns a string array with the text of the tag of each object"""
+    return [current_tag.get(tag) for current_tag in object_array]
+
+
+def search_by_key_json(key_json, collection_name=conf.DB_MAIN_COLLECTION):
+    """ Search on the db by the received json keys object"""
+    my_db = ManageDB(collection_name)
+    result = []
+    try:
+        result = my_db.select_json(key_json)
+
+    except Exception as e:
+        logger.info("[ERROR] searching documents by json {}".format(e))
+    finally:
+        if my_db is not None:
+            my_db.close()
+
+    return result

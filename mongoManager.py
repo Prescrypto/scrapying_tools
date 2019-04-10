@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from pymongo.collation import Collation, CollationStrength
 import logging
 #internal
 import config as conf
@@ -87,7 +88,11 @@ class ManageDB():
 
     def update(self, jsonKey, myjson):
         result = []
-        docs = self.collection.update_many(jsonKey, {"$set": myjson}, upsert=False)
+        docs = self.collection.update_many(jsonKey,
+                                           {"$set": myjson},
+                                           upsert=False,
+                                           collation=Collation(locale='es',
+                                                               strength=CollationStrength.SECONDARY))
         if docs is not None:
             result = True
 
@@ -116,28 +121,32 @@ class ManageDB():
 
     def select_json(self, json):
         result = []
-        docs = self.collection.find(json, {'_id': False})
+        docs = self.collection.find(json, {'_id': False},
+                                    collation=Collation(locale='es', strength=CollationStrength.SECONDARY))
         if docs is not None:
             result = list(docs)
         return result
 
     def select_from_list(self, key, mylist):
         result = []
-        docs = self.collection.find({key: {"$in": mylist}}, {'_id': False})
+        docs = self.collection.find({key: {"$in": mylist}}, {'_id': False},
+                                    collation=Collation(locale='es', strength=CollationStrength.SECONDARY))
         if docs is not None:
             result = list(docs)
         return result
 
     def select_and(self, jsonlist):
         result = []
-        docs = self.collection.find({"$and": jsonlist}, {'_id': False})
+        docs = self.collection.find({"$and": jsonlist}, {'_id': False},
+                                    collation=Collation(locale='es', strength=CollationStrength.SECONDARY))
         if docs is not None:
             result = list(docs)
         return result
 
     def select_or(self, jsonlist):
         result = []
-        docs = self.collection.find({"$or": jsonlist}, {'_id': False})
+        docs = self.collection.find({"$or": jsonlist}, {'_id': False},
+                                    collation=Collation(locale='es', strength=CollationStrength.SECONDARY))
         if docs is not None:
             result = list(docs)
         return result
