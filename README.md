@@ -10,8 +10,7 @@ To get started you have to execute the requirements.txt file:
 
 Then in the main namespace you can call the methods you need, to scrape the page, as example you can use the following script to obtain the title, image and description of a products catalog on a certain page and then store the data on mongodb:
 
-First we need to initialize the Environment variables to our own.
-For this example we need to set:
+First we need to initialize the Environment variables found on the config.py file to our own.
 ```
 DB_MAIN_COLLECTION = The name of the collection we are going to get and update (if we want to insert the new information to another collection we just have to send that field when calling the 
 load_mongo_collection(collection_name=<NEW NAME>)
