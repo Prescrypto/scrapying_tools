@@ -12,11 +12,12 @@ Then in the main namespace you can call the methods you need, to scrape the page
 
 First we need to initialize the Environment variables to our own.
 For this example we need to set:
-DB_MAIN_COLLECTION = The name of the collection we are going to get and update (if we want to insert the new information to another collection we just have to send that field when calling the 
-```load_mongo_collection(collection_name=<NEW NAME>) ```
-or the
-```modify_collection_fields(data_json_list, keys_list, collection_name=<NEW NAME>)```
 ```
+DB_MAIN_COLLECTION = The name of the collection we are going to get and update (if we want to insert the new information to another collection we just have to send that field when calling the 
+load_mongo_collection(collection_name=<NEW NAME>)
+or the
+modify_collection_fields(data_json_list, keys_list, collection_name=<NEW NAME>)```
+
 AWS_ACCESS_KEY = Amazon access key
 AWS_SECRET_KEY = Amazon secret key
 FOLDER = S3 Folder
