@@ -16,12 +16,14 @@ DB_MAIN_COLLECTION = The name of the collection we are going to get and update (
 ```load_mongo_collection(collection_name=<NEW NAME>) ```
 or the
 ```modify_collection_fields(data_json_list, keys_list, collection_name=<NEW NAME>)```
+```
 AWS_ACCESS_KEY = Amazon access key
 AWS_SECRET_KEY = Amazon secret key
 FOLDER = S3 Folder
 S3_BASE_URL = "https://s3-us-west-2.amazonaws.com/<BUCKET NAME>/<S3 FOLDER>/{}.png"
 MONGO_URI = Yo can change the uri to your own, local or remote
 DEFAULT_DB = The data base name
+```
 
 ``` 
 import os
