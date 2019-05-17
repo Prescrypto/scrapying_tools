@@ -12,7 +12,9 @@ Then in the main namespace you can call the methods you need, to scrape the page
 
 First we need to initialize the Environment variables found on the config.py file to our own.
 ```
-DB_MAIN_COLLECTION = The name of the collection we are going to get and update (if we want to insert the new information to another collection we just have to send that field when calling the 
+DB_MAIN_COLLECTION = The name of the collection we are going to get and update 
+(if we want to insert the new information to another collection we just have 
+to send that field when calling the 
 load_mongo_collection(collection_name=<NEW NAME>)
 or the
 modify_collection_fields(data_json_list, keys_list, collection_name=<NEW NAME>)```
