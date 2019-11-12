@@ -181,18 +181,21 @@ def get_html_page(page_url):
 
 def get_soup_obj_by_dom_tag(soup, object_dom, tag_value, object_tag="class"):
     """ Search for all the objects in the current soup object with this specific HTML dom and tag value"""
+    """ ie: get_soup_obj_by_dom_tag(soup, "img", "item-image img-responsive") """
     object_array = soup.find_all(object_dom, attrs={object_tag: tag_value})
     return object_array
 
 
 def get_soup_obj_by_dom(soup, object_dom):
     """ Search for all the objects in the current soup object with this specific HTML dom and tag value"""
+    """ ie: get_soup_obj_by_dom(soup, "div") """
     object_array = soup.find_all(object_dom)
     return object_array
 
 
 def get_soup_tables_on_single_table(soup, table_tag_value, table_tag="class", columns_to_keep=[]):
     """ Search for all the objects in the current soup object with this specific HTML dom and tag value"""
+    """ ie: get_soup_tables_on_single_table(soup, "tabla-123", [0,1]) """
     new_table_array = []
     tables_array = soup.find_all("table", attrs={table_tag: table_tag_value})
     for current_table in tables_array:
@@ -214,17 +217,6 @@ def get_soup_tables_on_single_table(soup, table_tag_value, table_tag="class", co
     return new_table_array
 
 
-def get_html_obj_by_dom_tag(page_url, object_dom, tag_value, object_tag="class"):
-    """ Search for all the objects in the current url with this specific HTML dom and class"""
-    http = urllib3.PoolManager()
-    response = http.request('GET', page_url)
-    soup = BeautifulSoup(response.data, 'html.parser')
-
-    object_array = soup.find_all(object_dom, attrs={object_tag: tag_value})
-    response.release_conn()
-    return object_array
-
-
 def get_text_from_object(object_array):
     """ Receives a soup4 object array and returns a string array with the text of each object"""
     return [current_tag.text.strip() for current_tag in object_array]
@@ -232,6 +224,7 @@ def get_text_from_object(object_array):
 
 def get_tag_from_object(object_array, tag):
     """ Receives a soup4 object array and returns a string array with the text of the tag of each object"""
+    """ ie: get_tag_from_object(object_array, "href")"""
     return [current_tag.get(tag) for current_tag in object_array]
 
 
